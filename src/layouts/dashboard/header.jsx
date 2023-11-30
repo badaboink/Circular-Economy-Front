@@ -18,6 +18,7 @@ import { bgBlur } from 'src/theme/css';
 import Iconify from 'src/components/iconify';
 
 // import Searchbar from './common/searchbar';
+import {isLoggedIn} from '../../utils/logic';
 import { NAV, HEADER } from './config-layout';
 import AccountPopover from './common/account-popover';
 import LoginView from '../../sections/login/login-view';
@@ -29,6 +30,7 @@ export default function Header({ onOpenNav }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const lgUp = useResponsive('up', 'lg');
+  const userIsLoggedIn = isLoggedIn();
 
   const handleLogin = () => {
     setIsModalOpen(true);
@@ -49,11 +51,17 @@ export default function Header({ onOpenNav }) {
       {/* <Searchbar /> */}
 
       <Box sx={{ flexGrow: 1 }} />
-
-      <Stack direction="row" alignItems="center" spacing={1}>
+      
+        <Stack direction="row" alignItems="center" spacing={1}>
+        {!userIsLoggedIn && (
         <Button variant='contained' onClick={handleLogin}>Login</Button>
+        )}
+        {userIsLoggedIn && (
         <AccountPopover />
+        )}
       </Stack>
+      
+      
     </>
   );
 

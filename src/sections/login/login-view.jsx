@@ -10,34 +10,76 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { useRouter } from 'src/routes/hooks';
-
 import { bgGradient } from 'src/theme/css';
 
 import Iconify from 'src/components/iconify';
+
+import {LOGIN_URL} from '../../utils/apiUrls';
 
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
   const theme = useTheme();
 
-  const router = useRouter();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+  });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleClick = () => {
-    router.push('/dashboard');
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleClick = async (event) =>{
+    event.preventDefault();
+    try{
+      const user = {
+        username: formData.username,
+        password: formData.password,
+      };
+      const loginResponse = await fetch(LOGIN_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
+      const responseData = await loginResponse.json();
+      if (loginResponse.status === 200) {
+        localStorage.setItem('token', responseData.access_token);
+        window.location = "/";
+      }else {
+        // Handle login failure and set the error message
+        setErrorMessage('Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      setErrorMessage('An error occurred while logging in.');
+    }
   };
 
   const renderForm = (
-    <>
+    <form noValidate onSubmit={handleClick}>
       <Stack spacing={3}>
-        <TextField name="username" label="Username" />
+        <TextField
+            name="username"
+            label="Username"
+            value={formData.username}
+            onChange={handleChange}
+          />
 
         <TextField
           name="password"
           label="Password"
           type={showPassword ? 'text' : 'password'}
+          value={formData.password}
+          onChange={handleChange}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -56,12 +98,12 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
+        // onClick={handleClick}
         sx={{mt: 3}}
       >
         Login
       </LoadingButton>
-    </>
+    </form>
   );
 
   return (
@@ -85,12 +127,20 @@ export default function LoginView() {
         >
           <Typography variant="h4">Sign in</Typography>
 
+          
+
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
             Don’t have an account?
             <a href='/register'><b>Get started</b></a>
           </Typography>
 
           {renderForm}
+
+          {errorMessage && (
+            <Typography variant="body2" sx={{ mt: 2, mb: 2, color: 'error.main' }}>
+              {errorMessage}
+            </Typography>
+          )}
         </Card>
       </Stack>
     </Box>

@@ -14,6 +14,8 @@ import { bgGradient } from 'src/theme/css';
 
 import Iconify from 'src/components/iconify';
 
+import {REGISTER_URL} from '../../utils/apiUrls';
+
 // ----------------------------------------------------------------------
 
 export default function RegisterView() {
@@ -29,6 +31,7 @@ export default function RegisterView() {
   });
 
   const [errors, setErrors] = useState({});
+  const [errorMessage, setErrorMessage] = useState('');
 
   const validateForm = () => {
     let valid = true;
@@ -70,18 +73,38 @@ export default function RegisterView() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) =>{
     event.preventDefault();
-
     if (validateForm()) {
-      console.log('Form submitted:', formData);
-    } else {
-      console.log('Form is not valid');
+      try{
+        const user = {
+          username: formData.username,
+          password: formData.password,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber
+        };
+        const registerResponse = await fetch(REGISTER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(user),
+        });
+        const responseData = await registerResponse.json();
+        if (registerResponse.status === 200) {
+          localStorage.setItem('token', responseData.access_token);
+          window.location = "/";
+        }else {
+          setErrorMessage('Registration failed.');
+        }
+      } catch (error) {
+        setErrorMessage('An error occurred while registering in.');
+      }
     }
   };
 
   const renderForm = (
-    <>
+    <form noValidate onSubmit={handleSubmit}>
       <Stack spacing={3}>
         <TextField
           name="username"
@@ -137,12 +160,11 @@ export default function RegisterView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleSubmit}
         sx={{ mt: 3 }}
       >
         Register
       </LoadingButton>
-    </>
+    </form>
   );
 
   return (
@@ -171,6 +193,11 @@ export default function RegisterView() {
             <a href='/login'><b>Sign in</b></a>
           </Typography>
           {renderForm}
+          {errorMessage && (
+            <Typography variant="body2" sx={{ mt: 2, mb: 2, color: 'error.main' }}>
+              {errorMessage}
+            </Typography>
+          )}
         </Card>
       </Stack>
     </Box>

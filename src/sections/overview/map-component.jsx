@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Marker, GoogleMap, InfoWindow, useLoadScript } from '@react-google-maps/api';
 
 import { Box, Card, Button, Typography } from '@mui/material';
@@ -22,13 +22,19 @@ const Map = ({ filter, color }) =>  {
   });
 
   const [zoom, setZoom] = useState(13);
-
+  const [centerPosition, setCenterPosition] = useState(center);
   const [selectedMarker, setSelectedMarker] = useState(null);
 
-  const handleMarkerClick = (city) => {
+  const handleMarkerClick = useCallback((city) => {
     setSelectedMarker(city);
     setZoom(16);
-  };
+    setCenterPosition(city.position);
+  }, []);
+  const handleInfoWindowClose = useCallback(() => {
+    setSelectedMarker(null);
+    setZoom(13);
+    setCenterPosition(center);
+  }, []);
 
   if (loadError) {
     return <div>Error loading maps</div>;
@@ -44,7 +50,7 @@ const Map = ({ filter, color }) =>  {
         <GoogleMap
           mapContainerStyle={mapContainerStyle}
           zoom={zoom}
-          center={center}
+          center={centerPosition}
         >
           {filter.map((city, index) => (
             <Marker
@@ -65,7 +71,7 @@ const Map = ({ filter, color }) =>  {
         {selectedMarker && selectedMarker.position && (
             <InfoWindow
               position={selectedMarker.position}
-              onCloseClick={() => setSelectedMarker(null)}
+              onCloseClick={handleInfoWindowClose}
               options={{ maxWidth: 250, minWidth: 250 }}
             >
               <div>

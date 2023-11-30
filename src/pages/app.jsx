@@ -8,7 +8,7 @@ export default function AppPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard temp title </title>
+        <title> Salvage </title>
       </Helmet>
 
       <AppView />

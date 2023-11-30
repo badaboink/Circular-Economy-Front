@@ -11,6 +11,8 @@ import IconButton from '@mui/material/IconButton';
 
 import { account } from 'src/_mock/account';
 
+import {getUsername} from "../../../utils/logic";
+
 // ----------------------------------------------------------------------
 
 const MENU_OPTIONS = [
@@ -24,6 +26,7 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
+  const username = getUsername();
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -31,6 +34,10 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     setOpen(null);
+  };
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.reload();
   };
 
   return (
@@ -49,14 +56,14 @@ export default function AccountPopover() {
       >
         <Avatar
           src={account.photoURL}
-          alt={account.displayName}
+          alt={username}
           sx={{
             width: 36,
             height: 36,
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {account.displayName.charAt(0).toUpperCase()}
+          {username.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -77,10 +84,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+          @{username}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            Welcome!
           </Typography>
         </Box>
 
@@ -97,7 +104,7 @@ export default function AccountPopover() {
         <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleClose}
+          onClick={handleLogout}
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
           Logout

@@ -9,6 +9,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import Map from '../map-component';
+import {isLoggedIn } from "../../../utils/logic";
 
 // ----------------------------------------------------------------------
 
@@ -45,6 +46,7 @@ export default function AppView() {
   const { index } = useParams();
   const [filter, setFilter] = useState(defaultFilter);
   const [color, setColor] = useState(theme.palette.primary.main);
+  const userIsLoggedIn = isLoggedIn();
 
  
 
@@ -63,17 +65,27 @@ export default function AppView() {
     <Container maxWidth="xl">
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} md={6}>
-          <Typography variant="h4" sx={{ mb: 5 }}>
+          {userIsLoggedIn &&(
+            <Typography variant="h4" sx={{ mb: 5 }}>
             Hi, Welcome back 👋
-          </Typography>
+            </Typography>
+          )}
+          {!userIsLoggedIn &&(
+            <Typography variant="h4" sx={{ mb: 5 }}>
+            Welcome ♻️
+            </Typography>
+          )}
         </Grid>
+        
         <Grid item xs={12} md={6} container justifyContent="flex-end">
+        {userIsLoggedIn &&(<>
           <Button variant="outlined" sx={{mr: 1}}>
             +
           </Button>
           <Button variant="outlined">
             All posts
           </Button>
+        </>)}
         </Grid>
         <Grid item xs={12} md={12} lg={12}>
           <Map filter={filter} color={color} />
