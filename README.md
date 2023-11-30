@@ -1,1 +1,1 @@
-# Circular-Economy-Front
+# Circular Economy Zero Waste Web Application Frontend
