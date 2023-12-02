@@ -55,7 +55,6 @@ export default function LoginView() {
         localStorage.setItem('token', responseData.access_token);
         window.location = "/";
       }else {
-        // Handle login failure and set the error message
         setErrorMessage('Login failed. Please check your credentials.');
       }
     } catch (error) {

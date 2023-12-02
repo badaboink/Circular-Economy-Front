@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -20,16 +20,17 @@ import Logo from 'src/components/logo';
 import Scrollbar from 'src/components/scrollbar';
 
 import { NAV } from './config-layout';
-import navConfig from './config-navigation';
+import { generateNavConfig } from './config-navigation';
 import {isLoggedIn, getUsername } from "../../utils/logic";
 
 
 // ----------------------------------------------------------------------
 
 export default function Nav({ openNav, onCloseNav }) {
-  const pathname = usePathname();
+  // const pathname = usePathname();
   const userIsLoggedIn = isLoggedIn();
   const username = getUsername();
+  const [navConfig, setNavConfig] = useState([]);
 
   const upLg = useResponsive('up', 'lg');
 
@@ -37,8 +38,18 @@ export default function Nav({ openNav, onCloseNav }) {
     if (openNav) {
       onCloseNav();
     }
+    const fetchData = async () => {
+      try {
+        const config = await generateNavConfig();
+        setNavConfig(config);
+      } catch (error) {
+        console.error('Error fetching nav config:', error);
+      }
+    };
+
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, []);
 
   const renderAccount = (
     <Box

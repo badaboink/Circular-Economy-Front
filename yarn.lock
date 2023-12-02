@@ -2572,7 +2572,7 @@ prettier@^3.0.3, prettier@>=3.0.0:
   resolved "https://registry.npmjs.org/prettier/-/prettier-3.0.3.tgz"
   integrity sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==
 
-prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@^15.5.8, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -2642,6 +2642,14 @@ react-is@^18.2.0:
   resolved "https://registry.npmjs.org/react-is/-/react-is-18.2.0.tgz"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
 
+react-places-autocomplete@^7.3.0:
+  version "7.3.0"
+  resolved "https://registry.npmjs.org/react-places-autocomplete/-/react-places-autocomplete-7.3.0.tgz"
+  integrity sha512-86wcHC69JATvWBnIS/yCsBHLtwzOGcnx3Ye94u74yTrz1jLRC/txkVDkf6rvC+Jq3zNe/tAg/W53x0EaH1ZPPw==
+  dependencies:
+    lodash.debounce "^4.0.8"
+    prop-types "^15.5.8"
+
 react-router-dom@^6.16.0:
   version "6.16.0"
   resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.16.0.tgz"
@@ -2667,7 +2675,7 @@ react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-"react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.6.0 || ^17.0.0 || ^18.0.0", "react@^16.8 || ^17 || ^18", "react@^16.8.0 || ^17 || ^18", "react@^17.0.0 || ^18.0.0", react@^18.2.0, "react@>= 16.8.0", react@>=0.13, react@>=16, react@>=16.6.0, react@>=16.8, react@>=16.8.0, react@>=18:
+"react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.6.0 || ^17.0.0 || ^18.0.0", "react@^16.8 || ^17 || ^18", "react@^16.8.0 || ^17 || ^18", "react@^17.0.0 || ^18.0.0", react@^18.2.0, "react@>= 16.8.0", react@>=0.13, react@>=0.14.7, react@>=16, react@>=16.6.0, react@>=16.8, react@>=16.8.0, react@>=18:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==

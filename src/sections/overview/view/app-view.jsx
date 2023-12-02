@@ -1,6 +1,6 @@
 
-import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 
 import Map from '../map-component';
 import {isLoggedIn } from "../../../utils/logic";
+import {POSTS_URL} from "../../../utils/apiUrls";
 
 // ----------------------------------------------------------------------
 
@@ -37,29 +38,57 @@ const filter2 = [
     description: 'Description 4...',
   },
 ];
+
 const filters = [filter1, filter2];
 const defaultFilter = [
 ];
 export default function AppView() {
   const theme = useTheme();
-
+  const navigate = useNavigate();
   const { index } = useParams();
   const [filter, setFilter] = useState(defaultFilter);
   const [color, setColor] = useState(theme.palette.primary.main);
-  const userIsLoggedIn = isLoggedIn();
-
- 
+  const userIsLoggedIn = isLoggedIn(); 
 
   useEffect(() => {
-    const colors = [theme.palette.primary.light, theme.palette.primary.dark];
-    const filterIndex = parseInt(index, 10);
-    if (!Number.isNaN(filterIndex) && filterIndex >= 0 && filterIndex < filters.length) {
-      setFilter(filters[filterIndex]);
-      setColor(colors[filterIndex])
-    } else {
-      setFilter(defaultFilter);
-    }
+    const fetchData = async () => {
+      const colors = [theme.palette.primary.light, theme.palette.primary.dark];
+      const filterIndex = parseInt(index, 10);
+
+      if (!Number.isNaN(filterIndex) && filterIndex >= 0 && filterIndex < filters.length) {
+        setFilter(filters[filterIndex]);
+        setColor(colors[filterIndex]);
+      } else {
+        try {
+          const fetchResponse = await fetch(POSTS_URL, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          const responseData = await fetchResponse.json();
+          if (fetchResponse.status === 200) {
+            console.log(responseData);
+            const formattedData = responseData.map((item) => ({
+              title: item.title,
+              position: { lat: item.latitude, lng: item.longitude },
+              description: item.description,
+            }));
+            setFilter(formattedData);
+            setColor(colors[0]);
+          }
+          
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      }
+    };
+    fetchData();
   }, [index, theme.palette.primary.light, theme.palette.primary.dark]);
+
+  const handleNewPostClick = () => {
+    navigate('/post');
+  };
 
   return (
     <Container maxWidth="xl">
@@ -79,7 +108,7 @@ export default function AppView() {
         
         <Grid item xs={12} md={6} container justifyContent="flex-end">
         {userIsLoggedIn &&(<>
-          <Button variant="outlined" sx={{mr: 1}}>
+          <Button variant="outlined" sx={{mr: 1}} onClick={handleNewPostClick}>
             +
           </Button>
           <Button variant="outlined">
