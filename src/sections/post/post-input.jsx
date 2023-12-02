@@ -57,8 +57,7 @@ export default function PostInput() {
     try{
       if(!priceError && !errorMessage)
       {
-        const formDataTemp = new FormData();
-        formDataTemp.append('post', JSON.stringify({
+        const postData = {
           title: formData.title,
           address: formData.address,
           description: formData.description,
@@ -66,16 +65,16 @@ export default function PostInput() {
           resourceType: formData.type.name,
           latitude: 1,
           longitude: 1,
-        }));
-        formDataTemp.append('image', selectedImage);
-        console.log(formDataTemp);
+        };
+        console.log(selectedImage);
+        // formDataTemp.append('image', selectedImage);
         const response = await fetch(POSTS_URL, {
           method: 'POST',
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.token}`
           },
-          body: formDataTemp,
+          body: JSON.stringify(postData),
         });
         if (response.status === 201) {
           window.location = "/";
@@ -129,10 +128,11 @@ export default function PostInput() {
         >
           {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
             <div>
-              <input
+              <TextField
                 {...getInputProps({
-                  placeholder: 'Search Places ...',
-                  className: 'location-search-input',
+                  label: 'Search Places ...',
+                  variant: 'outlined',
+                  fullWidth: true,
                 })}
               />
               <div className="autocomplete-dropdown-container">
@@ -162,13 +162,6 @@ export default function PostInput() {
           error={!!priceError}
           helperText={priceError}
         />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(event) => {
-            setSelectedImage(event.target.files[0]);
-          }}
-        />
         <Autocomplete
           id="types"
           name="types"
@@ -183,6 +176,13 @@ export default function PostInput() {
               ...formData,
               type: newValue,
             });
+          }}
+        />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            setSelectedImage(event.target.files[0]);
           }}
         />
       </Stack>

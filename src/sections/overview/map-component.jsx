@@ -4,6 +4,8 @@ import { Marker, GoogleMap, InfoWindow, useLoadScript } from '@react-google-maps
 
 import { Box, Card, Button, Typography } from '@mui/material';
 
+import {isLoggedIn} from '../../utils/logic';
+
 const libraries = ['places'];
 const mapContainerStyle = {
   width: '100rem',
@@ -20,6 +22,7 @@ const Map = ({ filter, color }) =>  {
     googleMapsApiKey: 'AIzaSyDXBoMxUb1A-6yy3bSWPXE1QHPnwD6jmI4',
     libraries,
   });
+  const userIsLoggedIn = isLoggedIn();
 
   const [zoom, setZoom] = useState(13);
   const [centerPosition, setCenterPosition] = useState(center);
@@ -43,6 +46,7 @@ const Map = ({ filter, color }) =>  {
   if (!isLoaded) {
     return <div>Loading maps</div>;
   }
+  console.log(filter);
 
   return (
     <Card>
@@ -76,9 +80,11 @@ const Map = ({ filter, color }) =>  {
             >
               <div>
                 <Typography variant="h4">{selectedMarker.title}</Typography>
-                <Typography variant="subtitle2">Address</Typography>
+                <Typography variant="subtitle2">{selectedMarker.address}</Typography>
                 <Typography variant="body">{selectedMarker.description}</Typography>
+                {userIsLoggedIn &&(
                 <center><Button>Contact</Button></center>
+                )}
               </div>
             </InfoWindow>
           )}

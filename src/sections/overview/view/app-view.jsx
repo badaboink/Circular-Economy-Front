@@ -42,6 +42,7 @@ export default function AppView() {
         const formattedData = responseData.data.map((item) => ({
           title: item.title,
           position: { lat: item.latitude, lng: item.longitude },
+          address: item.address,
           description: item.description,
         }));
         setFilter(formattedData);
@@ -56,9 +57,10 @@ export default function AppView() {
           });
           const responseData = await fetchResponse.json();
           if (fetchResponse.status === 200) {
-            const formattedData = responseData.map((item) => ({
+            const formattedData = responseData.data.map((item) => ({
               title: item.title,
               position: { lat: item.latitude, lng: item.longitude },
+              address: item.address,
               description: item.description,
             }));
             setFilter(formattedData);
