@@ -19,21 +19,21 @@
 // }));
 
 // export default navConfig;
-import {RESOURCE_TYPES_DESC_URL} from '../../utils/apiUrls';
+import {RESOURCE_TYPES_URL} from '../../utils/apiUrls';
 
 
 export const generateNavConfig = async () => {
   try {
-    const response = await fetch(RESOURCE_TYPES_DESC_URL, {
+    const response = await fetch(RESOURCE_TYPES_URL, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
     const responseData = await response.json();
-    const navConfig = responseData.descriptions.map((description, index) => ({
-      title: description,
-      path: `/resource/${index}`,
+    const navConfig = responseData.data.map((item, index) => ({
+      title: item.description,
+      path: `/resource/${item.name}`,
     }));
 
     return navConfig;

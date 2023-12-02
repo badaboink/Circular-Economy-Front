@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PlacesAutocomplete from 'react-places-autocomplete';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -56,24 +57,25 @@ export default function PostInput() {
     try{
       if(!priceError && !errorMessage)
       {
-        const post = {
+        const formDataTemp = new FormData();
+        formDataTemp.append('post', JSON.stringify({
           title: formData.title,
           address: formData.address,
           description: formData.description,
-          image: selectedImage,
           price: formData.price,
           resourceType: formData.type.name,
-          latitude: 54.8985,
-          longitude: 23.9036
-        };
-        console.log(post);
+          latitude: 1,
+          longitude: 1,
+        }));
+        formDataTemp.append('image', selectedImage);
+        console.log(formDataTemp);
         const response = await fetch(POSTS_URL, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${localStorage.token}`
           },
-          body: JSON.stringify(post),
+          body: formDataTemp,
         });
         if (response.status === 201) {
           window.location = "/";
@@ -85,6 +87,9 @@ export default function PostInput() {
       console.error('Posting failed:', error);
       setErrorMessage('An error occurred while posting.');
     }
+  };
+  const handleSelect = (address) => {
+    setFormData({ ...formData, address });
   };
   useEffect(() => {
     const fetchResourceTypes = async () => {
@@ -117,12 +122,30 @@ export default function PostInput() {
             value={formData.title}
             onChange={handleChange}
           />
-        <TextField
-            name="address"
-            label="Address"
-            value={formData.address}
-            onChange={handleChange}
-          />
+        <PlacesAutocomplete
+        value={formData.address}
+        onChange={(address) => setFormData({ ...formData, address })}
+        onSelect={handleSelect}
+        >
+          {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+            <div>
+              <input
+                {...getInputProps({
+                  placeholder: 'Search Places ...',
+                  className: 'location-search-input',
+                })}
+              />
+              <div className="autocomplete-dropdown-container">
+                {loading && <div>Loading...</div>}
+                {suggestions.map((suggestion) => (
+                  <div {...getSuggestionItemProps(suggestion)}>
+                    {suggestion.description}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </PlacesAutocomplete>
 
         <TextField
           name="description"

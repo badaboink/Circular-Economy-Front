@@ -20,6 +20,10 @@ const MENU_OPTIONS = [
     label: 'Messages',
     icon: 'eva:home-fill',
   },
+  {
+    label: 'My posts',
+    icon: 'eva:home-fill',
+  },
 ];
 
 // ----------------------------------------------------------------------

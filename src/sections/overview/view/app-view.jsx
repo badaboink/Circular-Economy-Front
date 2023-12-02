@@ -14,32 +14,6 @@ import {POSTS_URL} from "../../../utils/apiUrls";
 
 // ----------------------------------------------------------------------
 
-const filter1 = [
-  {
-    title: 'Title1',
-    position: { lat: 54.9087, lng: 23.9229 },
-    description: 'Description 1...',
-  },
-  {
-    title: 'Title2',
-    position: { lat: 54.8776, lng: 23.8821 },
-    description: 'Description 2...',
-  },
-];
-const filter2 = [
-  {
-    title: 'Title3',
-    position: { lat: 54.9132, lng: 23.8210 },
-    description: 'Description 3...',
-  },
-  {
-    title: 'Title5',
-    position: { lat: 54.904974, lng: 23.957220  },
-    description: 'Description 4...',
-  },
-];
-
-const filters = [filter1, filter2];
 const defaultFilter = [
 ];
 export default function AppView() {
@@ -52,12 +26,26 @@ export default function AppView() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const colors = [theme.palette.primary.light, theme.palette.primary.dark];
-      const filterIndex = parseInt(index, 10);
-
-      if (!Number.isNaN(filterIndex) && filterIndex >= 0 && filterIndex < filters.length) {
-        setFilter(filters[filterIndex]);
-        setColor(colors[filterIndex]);
+      const colors = [theme.palette.info.main, theme.palette.success.main, theme.palette.primary.dark, theme.palette.primary.main,
+        theme.palette.secondary.light, theme.palette.primary.light, theme.palette.secondary.dark, theme.palette.secondary.main,
+        theme.palette.primary.darker, theme.palette.warning.light, theme.palette.secondary.darker, theme.palette.warning.lighter,
+        theme.palette.info.dark, theme.palette.info.darker, theme.palette.warning.main
+      ];
+      if (index) {
+        const fetchResponse = await fetch(`${POSTS_URL}/${index}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const responseData = await fetchResponse.json();
+        const formattedData = responseData.data.map((item) => ({
+          title: item.title,
+          position: { lat: item.latitude, lng: item.longitude },
+          description: item.description,
+        }));
+        setFilter(formattedData);
+        setColor(colors[responseData.index]);
       } else {
         try {
           const fetchResponse = await fetch(POSTS_URL, {
@@ -68,14 +56,13 @@ export default function AppView() {
           });
           const responseData = await fetchResponse.json();
           if (fetchResponse.status === 200) {
-            console.log(responseData);
             const formattedData = responseData.map((item) => ({
               title: item.title,
               position: { lat: item.latitude, lng: item.longitude },
               description: item.description,
             }));
             setFilter(formattedData);
-            setColor(colors[0]);
+            setColor(colors[14]);
           }
           
         } catch (error) {
@@ -84,7 +71,10 @@ export default function AppView() {
       }
     };
     fetchData();
-  }, [index, theme.palette.primary.light, theme.palette.primary.dark]);
+  }, [index, theme.palette.info.main, theme.palette.success.main, theme.palette.primary.dark, theme.palette.primary.main,
+    theme.palette.secondary.light, theme.palette.primary.light, theme.palette.secondary.dark, theme.palette.secondary.main,
+    theme.palette.primary.darker, theme.palette.warning.light, theme.palette.secondary.darker, theme.palette.warning.lighter,
+    theme.palette.info.dark, theme.palette.info.darker, theme.palette.warning.main]);
 
   const handleNewPostClick = () => {
     navigate('/post');

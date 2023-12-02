@@ -17,7 +17,7 @@ const center = {
 const Map = ({ filter, color }) =>  {
   
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: '',
+    googleMapsApiKey: 'AIzaSyDXBoMxUb1A-6yy3bSWPXE1QHPnwD6jmI4',
     libraries,
   });
 
