@@ -150,7 +150,7 @@ export default function PostInput() {
         />
         <TextField
           name="price"
-          label="Price"
+          label="Price in €"
           type="number"
           value={formData.password}
           onChange={handleChange}
