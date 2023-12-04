@@ -57,24 +57,19 @@ export default function PostInput() {
     try{
       if(!priceError && !errorMessage)
       {
-        const postData = {
-          title: formData.title,
-          address: formData.address,
-          description: formData.description,
-          price: formData.price,
-          resourceType: formData.type.name,
-          latitude: 1,
-          longitude: 1,
-        };
-        console.log(selectedImage);
-        // formDataTemp.append('image', selectedImage);
+        const formDataToSend = new FormData();
+        formDataToSend.append('postTitle', formData.title);
+        formDataToSend.append('address', formData.address);
+        formDataToSend.append('postDescription', formData.description);
+        formDataToSend.append('price', formData.price);
+        formDataToSend.append('resourceTypeName', formData.type.name);
+        formDataToSend.append('imageFile', selectedImage);
         const response = await fetch(POSTS_URL, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.token}`
           },
-          body: JSON.stringify(postData),
+          body: formDataToSend,
         });
         if (response.status === 201) {
           window.location = "/";

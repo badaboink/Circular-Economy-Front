@@ -22,7 +22,7 @@ export default function AppView() {
   const { index } = useParams();
   const [filter, setFilter] = useState(defaultFilter);
   const [color, setColor] = useState(theme.palette.primary.main);
-  const userIsLoggedIn = isLoggedIn(); 
+  const userIsLoggedIn = isLoggedIn();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +62,7 @@ export default function AppView() {
               position: { lat: item.latitude, lng: item.longitude },
               address: item.address,
               description: item.description,
+              image: item.dropboxTemporaryLink,
             }));
             setFilter(formattedData);
             setColor(colors[14]);

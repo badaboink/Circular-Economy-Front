@@ -46,7 +46,7 @@ const Map = ({ filter, color }) =>  {
   if (!isLoaded) {
     return <div>Loading maps</div>;
   }
-  console.log(filter);
+  // console.log(filter);
 
   return (
     <Card>
@@ -76,12 +76,20 @@ const Map = ({ filter, color }) =>  {
             <InfoWindow
               position={selectedMarker.position}
               onCloseClick={handleInfoWindowClose}
-              options={{ maxWidth: 250, minWidth: 250 }}
+              options={{ maxWidth: 300, minWidth: 300 }}
             >
               <div>
                 <Typography variant="h4">{selectedMarker.title}</Typography>
                 <Typography variant="subtitle2">{selectedMarker.address}</Typography>
                 <Typography variant="body">{selectedMarker.description}</Typography>
+                <br/>
+                <center>
+                <img
+                  src={selectedMarker.image}
+                  alt="Post"
+                  style={{ maxWidth: 200, maxHeight: 200 }}
+                />
+                </center>
                 {userIsLoggedIn &&(
                 <center><Button>Contact</Button></center>
                 )}
