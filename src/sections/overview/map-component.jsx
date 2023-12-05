@@ -105,6 +105,6 @@ const Map = ({ filter, color, center }) =>  {
 Map.propTypes = {
   filter: PropTypes.array,
   color: PropTypes.string,
-  center: PropTypes.array
+  center: PropTypes.any
 };
 export default Map;

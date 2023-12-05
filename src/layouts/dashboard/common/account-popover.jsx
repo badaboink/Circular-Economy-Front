@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -23,6 +24,7 @@ const MENU_OPTIONS = [
   {
     label: 'My posts',
     icon: 'eva:home-fill',
+    path: '/personal'
   },
 ];
 
@@ -30,6 +32,7 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
+  const navigate = useNavigate();
   const username = getUsername();
 
   const handleOpen = (event) => {
@@ -37,6 +40,11 @@ export default function AccountPopover() {
   };
 
   const handleClose = () => {
+    
+    setOpen(null);
+  };
+  const handleClick = (path) => {
+    navigate(path);
     setOpen(null);
   };
   const handleLogout = () => {
@@ -98,7 +106,7 @@ export default function AccountPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         {MENU_OPTIONS.map((option) => (
-          <MenuItem key={option.label} onClick={handleClose}>
+          <MenuItem key={option.label} onClick={() => handleClick(option.path)}>
             {option.label}
           </MenuItem>
         ))}
