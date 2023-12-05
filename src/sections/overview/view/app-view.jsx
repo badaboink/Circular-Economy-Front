@@ -10,6 +10,8 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
+import Iconify from 'src/components/iconify';
+
 import Map from '../map-component';
 import {isLoggedIn } from "../../../utils/logic";
 import {POSTS_URL} from "../../../utils/apiUrls";
@@ -53,10 +55,10 @@ export default function AppView() {
         });
         const responseData = await fetchResponse.json();
         const formattedData = responseData.data.map((item) => ({
-          title: item.title,
+          title: item.postTitle,
           position: { lat: item.latitude, lng: item.longitude },
           address: item.address,
-          description: item.description,
+          description: item.postDescription,
         }));
         setFilter(formattedData);
         setColor(colors[responseData.index]);
@@ -71,10 +73,10 @@ export default function AppView() {
           const responseData = await fetchResponse.json();
           if (fetchResponse.status === 200) {
             const formattedData = responseData.data.map((item) => ({
-              title: item.title,
+              title: item.postTitle,
               position: { lat: item.latitude, lng: item.longitude },
               address: item.address,
-              description: item.description,
+              description: item.postDescription,
               price: item.price,
               image: item.dropboxTemporaryLink,
             }));
@@ -167,13 +169,13 @@ export default function AppView() {
         
         {userIsLoggedIn &&(
         <Grid item xs={12} md={6} container justifyContent="flex-end" alignItems="flex-start">
-         <Button variant="outlined" sx={{mr: 1}} onClick={handleNewPostClick}>
-            +
-          </Button>
-          <Button variant="outlined">
+         <Button variant="outlined" color="inherit" sx={{mr: 1, height: 35}} onClick={handleNewPostClick} startIcon={<Iconify icon="eva:plus-fill" />}>
+          New post
+         </Button>
+          <Button variant="outlined" color="inherit">
             All posts
           </Button>
-          </Grid>
+        </Grid>
        )}
         <Grid item xs={12} md={12} lg={12}>
           {formData.coordinates && (
