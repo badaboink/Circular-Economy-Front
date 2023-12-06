@@ -31,10 +31,12 @@ export const generateNavConfig = async () => {
       },
     });
     const responseData = await response.json();
-    const navConfig = responseData.data.map((item, index) => ({
-      title: item.description,
-      path: `/resource/${item.name}`,
-    }));
+    const navConfig = [
+      ...responseData.data.map((item) => ({
+        title: item.description,
+        path: `/resource/${item.name}`,
+      })),
+    ];
 
     return navConfig;
   } catch (error) {

@@ -28,8 +28,8 @@ export default function Router() {
       children: [
         { element: <IndexPage />, index: true },
         { path: 'user', element: <UserPage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
+        // { path: 'products', element: <ProductsPage /> },
+        // { path: 'blog', element: <BlogPage /> },
         { path: 'resource/:index', element: <IndexPage /> },
         { path: 'personal', element: <UserPostPage /> },
       ],

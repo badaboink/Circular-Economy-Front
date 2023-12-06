@@ -24,3 +24,12 @@ export function getUsername(){
     }
     return null;
 }
+
+export function setUsernameIndex() {
+    const username = getUsername();
+    const hash = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  
+    const index = (hash % 25) + 1;
+    localStorage.setItem('avatar', index);
+    return index;
+}
