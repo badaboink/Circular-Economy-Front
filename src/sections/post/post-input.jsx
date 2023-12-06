@@ -159,7 +159,6 @@ export default function PostInput() {
             image: responseData.dropboxTemporaryLink
           });
         }
-        
       } catch (error) {
         console.error('Error fetching resource types:', error);
       }

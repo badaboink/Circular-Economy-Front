@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -17,6 +18,7 @@ import { useResponsive } from 'src/hooks/use-responsive';
 import { account } from 'src/_mock/account';
 
 import Logo from 'src/components/logo';
+import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import { NAV } from './config-layout';
@@ -28,9 +30,12 @@ import {isLoggedIn, getUsername } from "../../utils/logic";
 
 export default function Nav({ openNav, onCloseNav }) {
   // const pathname = usePathname();
+  const navigate = useNavigate();
+  const location = useLocation();
   const userIsLoggedIn = isLoggedIn();
   const username = getUsername();
   const [navConfig, setNavConfig] = useState([]);
+  const shouldShowElement = !location.pathname.includes('/resource/');
 
   const upLg = useResponsive('up', 'lg');
 
@@ -68,10 +73,6 @@ export default function Nav({ openNav, onCloseNav }) {
 
       <Box sx={{ ml: 2 }}>
         <Typography variant="subtitle2">@{username}</Typography>
-
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {account.role}
-        </Typography>
       </Box>
     </Box>
   );
@@ -99,9 +100,58 @@ export default function Nav({ openNav, onCloseNav }) {
 
       {userIsLoggedIn && (
         <>
-        {renderAccount}
+          {renderAccount}
+          {location.pathname !== '/' && shouldShowElement && (
+          <Stack component="nav" spacing={0.5} sx={{ px: 2}}>
+            <ListItemButton
+              onClick={() => navigate(-1)}
+              sx={{
+                minHeight: 44,
+                borderRadius: 0.75,
+                typography: 'body2',
+                color: 'text.secondary',
+                textTransform: 'capitalize',
+                fontWeight: 'fontWeightMedium',
+                }}
+              >
+              <Box component="span" sx={{ width: 24, height: 24, mr: 2 }}>
+                <Iconify icon="lets-icons:back" />
+              </Box>
+              <Box component="span"><b>Back</b></Box>
+          </ListItemButton>
+          </Stack>
+          )}
+          {(location.pathname === '/' || !shouldShowElement) && (
+          <Stack component="nav" spacing={0.5} sx={{ px: 2}}>
+            <ListItemButton
+              onClick={() => navigate(-1)}
+              sx={{
+                minHeight: 44,
+                borderRadius: 0.75,
+                typography: 'body2',
+                color: 'text.secondary',
+                textTransform: 'capitalize',
+                fontWeight: 'fontWeightMedium',
+                ...(location.pathname === '/' && {
+                  color: 'primary.main',
+                  fontWeight: 'fontWeightSemiBold',
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                  '&:hover': {
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.16),
+                  },
+                }),
+                }}
+              >
+              <Box component="span" sx={{ width: 24, height: 24, mr: 2 }}>
+                <Iconify icon="bxs:home" />
+              </Box>
+              <Box component="span"><b>All posts</b></Box>
+          </ListItemButton>
+          </Stack>
+          )}
         </>
       )}
+      
      {renderMenu}
 
 
