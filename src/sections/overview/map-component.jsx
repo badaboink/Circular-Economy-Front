@@ -4,7 +4,7 @@ import { Marker, GoogleMap, InfoWindow, useLoadScript } from '@react-google-maps
 
 import { Box, Card, Button, Typography } from '@mui/material';
 
-import {isLoggedIn} from '../../utils/logic';
+import {isLoggedIn, getUsername} from '../../utils/logic';
 
 const libraries = ['places'];
 const mapContainerStyle = {
@@ -13,6 +13,7 @@ const mapContainerStyle = {
 };
 
 const Map = ({ filter, color, center }) =>  {
+  const sender = getUsername();
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: 'AIzaSyDXBoMxUb1A-6yy3bSWPXE1QHPnwD6jmI4',
     libraries,
@@ -37,6 +38,11 @@ const Map = ({ filter, color, center }) =>  {
     setZoom(13);
     setCenterPosition(center);
   }, [center]);
+  const handleContact = useCallback((receiver) => {
+    console.log(sender);
+    console.log(receiver);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loadError) {
     return <div>Error loading maps</div>;
@@ -90,8 +96,11 @@ const Map = ({ filter, color, center }) =>  {
                   style={{ maxWidth: 200, maxHeight: 200 }}
                 />
                 </center>
-                {userIsLoggedIn &&(
-                <center><Button>Contact</Button></center>
+                {userIsLoggedIn 
+                // && sender !== selectedMarker.username
+                 &&(
+                <center><Button onClick={() => handleContact(selectedMarker.username)}>Contact</Button>
+                </center>
                 )}
               </div>
             </InfoWindow>
