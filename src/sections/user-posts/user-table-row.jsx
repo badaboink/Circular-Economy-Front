@@ -142,7 +142,7 @@ export default function UserTableRow({
           Are you sure you want to delete this post?
         </DialogTitle>
         <DialogContent>
-          {/* Add any additional content or details about the deletion if needed */}
+        This action cannot be undone.
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelDelete} color="primary">

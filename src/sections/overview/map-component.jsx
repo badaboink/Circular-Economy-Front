@@ -89,13 +89,16 @@ const Map = ({ filter, color, center }) =>  {
                 <br/>
                 <Typography variant="body">Price: {selectedMarker.price} €</Typography>
                 <br/>
-                <center>
+                { selectedMarker.image && (
+                  <center>
                 <img
                   src={selectedMarker.image}
                   alt="Post"
                   style={{ maxWidth: 200, maxHeight: 200 }}
                 />
                 </center>
+                )}
+                
                 {userIsLoggedIn 
                 // && sender !== selectedMarker.username
                  &&(
