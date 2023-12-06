@@ -59,6 +59,9 @@ export default function AppView() {
           position: { lat: item.latitude, lng: item.longitude },
           address: item.address,
           description: item.postDescription,
+          price: item.price,
+          image: item.dropboxTemporaryLink,
+          username: item.username,
         }));
         setFilter(formattedData);
         setColor(colors[responseData.index]);
@@ -79,6 +82,7 @@ export default function AppView() {
               description: item.postDescription,
               price: item.price,
               image: item.dropboxTemporaryLink,
+              username: item.username,
             }));
             setFilter(formattedData);
             setColor(colors[14]);
