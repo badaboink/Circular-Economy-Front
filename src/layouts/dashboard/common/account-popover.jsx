@@ -18,13 +18,18 @@ import {getUsername} from "../../../utils/logic";
 
 const MENU_OPTIONS = [
   {
-    label: 'Messages',
+    label: 'Profile',
     icon: 'eva:home-fill',
+    path: '/user'
   },
   {
     label: 'My posts',
     icon: 'eva:home-fill',
     path: '/personal'
+  },
+  {
+    label: 'Messages',
+    icon: 'eva:home-fill',
   },
 ];
 
@@ -49,7 +54,7 @@ export default function AccountPopover() {
   };
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.reload();
+    navigate('/');
   };
 
   return (

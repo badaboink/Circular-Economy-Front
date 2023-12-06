@@ -67,7 +67,11 @@ export default function Nav({ openNav, onCloseNav }) {
         borderRadius: 1.5,
         alignItems: 'center',
         bgcolor: (theme) => alpha(theme.palette.grey[500], 0.12),
+        '&:hover': {
+          cursor: 'pointer',
+        },
       }}
+      onClick={() => navigate('/user')}
     >
       <Avatar src={account.photoURL} alt="photoURL" />
 
@@ -101,56 +105,57 @@ export default function Nav({ openNav, onCloseNav }) {
       {userIsLoggedIn && (
         <>
           {renderAccount}
-          {location.pathname !== '/' && shouldShowElement && (
-          <Stack component="nav" spacing={0.5} sx={{ px: 2}}>
-            <ListItemButton
-              onClick={() => navigate(-1)}
-              sx={{
-                minHeight: 44,
-                borderRadius: 0.75,
-                typography: 'body2',
-                color: 'text.secondary',
-                textTransform: 'capitalize',
-                fontWeight: 'fontWeightMedium',
-                }}
-              >
-              <Box component="span" sx={{ width: 24, height: 24, mr: 2 }}>
-                <Iconify icon="lets-icons:back" />
-              </Box>
-              <Box component="span"><b>Back</b></Box>
-          </ListItemButton>
-          </Stack>
-          )}
-          {(location.pathname === '/' || !shouldShowElement) && (
-          <Stack component="nav" spacing={0.5} sx={{ px: 2}}>
-            <ListItemButton
-              onClick={() => navigate(-1)}
-              sx={{
-                minHeight: 44,
-                borderRadius: 0.75,
-                typography: 'body2',
-                color: 'text.secondary',
-                textTransform: 'capitalize',
-                fontWeight: 'fontWeightMedium',
-                ...(location.pathname === '/' && {
-                  color: 'primary.main',
-                  fontWeight: 'fontWeightSemiBold',
-                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
-                  '&:hover': {
-                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.16),
-                  },
-                }),
-                }}
-              >
-              <Box component="span" sx={{ width: 24, height: 24, mr: 2 }}>
-                <Iconify icon="bxs:home" />
-              </Box>
-              <Box component="span"><b>All posts</b></Box>
-          </ListItemButton>
-          </Stack>
-          )}
+          
         </>
       )}
+      {location.pathname !== '/' && shouldShowElement && (
+        <Stack component="nav" spacing={0.5} sx={{ px: 2}}>
+          <ListItemButton
+            onClick={() => navigate('/')}
+            sx={{
+              minHeight: 44,
+              borderRadius: 0.75,
+              typography: 'body2',
+              color: 'text.secondary',
+              textTransform: 'capitalize',
+              fontWeight: 'fontWeightMedium',
+              }}
+            >
+            <Box component="span" sx={{ width: 24, height: 24, mr: 2 }}>
+              <Iconify icon="lets-icons:back" />
+            </Box>
+            <Box component="span"><b>Back</b></Box>
+        </ListItemButton>
+        </Stack>
+        )}
+        {(location.pathname === '/' || !shouldShowElement) && (
+        <Stack component="nav" spacing={0.5} sx={{ px: 2}}>
+          <ListItemButton
+            onClick={() => navigate('/')}
+            sx={{
+              minHeight: 44,
+              borderRadius: 0.75,
+              typography: 'body2',
+              color: 'text.secondary',
+              textTransform: 'capitalize',
+              fontWeight: 'fontWeightMedium',
+              ...(location.pathname === '/' && {
+                color: 'primary.main',
+                fontWeight: 'fontWeightSemiBold',
+                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                '&:hover': {
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.16),
+                },
+              }),
+              }}
+            >
+            <Box component="span" sx={{ width: 24, height: 24, mr: 2 }}>
+              <Iconify icon="bxs:home" />
+            </Box>
+            <Box component="span"><b>All posts</b></Box>
+        </ListItemButton>
+        </Stack>
+        )}
       
      {renderMenu}
 

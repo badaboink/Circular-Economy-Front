@@ -15,6 +15,7 @@ import { bgGradient } from 'src/theme/css';
 import Iconify from 'src/components/iconify';
 
 import {REGISTER_URL} from '../../utils/apiUrls';
+import {setUsernameIndex} from "../../utils/logic";
 
 // ----------------------------------------------------------------------
 
@@ -55,7 +56,6 @@ export default function RegisterView() {
       valid = false;
     }
 
-
     // Validate password
     if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters long';
@@ -93,6 +93,7 @@ export default function RegisterView() {
         const responseData = await registerResponse.json();
         if (registerResponse.status === 200) {
           localStorage.setItem('token', responseData.access_token);
+          setUsernameIndex();
           window.location = "/";
         }else {
           setErrorMessage('Registration failed.');
