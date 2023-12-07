@@ -4,7 +4,7 @@ import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 import DashboardLayout from 'src/layouts/dashboard';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
-export const BlogPage = lazy(() => import('src/pages/blog'));
+export const BlogPage = lazy(() => import('src/pages/chat'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const UserPostPage = lazy(() => import('src/pages/user-posts'));
 export const LoginPage = lazy(() => import('src/pages/login'));
@@ -12,6 +12,7 @@ export const RegisterPage = lazy(() => import('src/pages/register'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const PostPage = lazy(() => import('src/pages/post'));
+export const ChatRoomPage = lazy(() => import('src/pages/chat'));
 
 // ----------------------------------------------------------------------
 
@@ -32,6 +33,8 @@ export default function Router() {
         // { path: 'blog', element: <BlogPage /> },
         { path: 'resource/:index', element: <IndexPage /> },
         { path: 'personal', element: <UserPostPage /> },
+        { path: 'chat', element: <ChatRoomPage /> },
+        { path: 'chat/:sender/:receiver', element: <ChatRoomPage /> },
       ],
     },
     {

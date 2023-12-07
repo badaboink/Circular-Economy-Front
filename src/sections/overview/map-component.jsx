@@ -1,11 +1,12 @@
+
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Marker, GoogleMap, InfoWindow, useLoadScript } from '@react-google-maps/api';
 
 import { Box, Card, Button, Typography } from '@mui/material';
 
 import {isLoggedIn, getUsername} from '../../utils/logic';
-import ChatRoom from '../chat/ChatRoom';
 
 const libraries = ['places'];
 const mapContainerStyle = {
@@ -14,6 +15,7 @@ const mapContainerStyle = {
 };
 
 const Map = ({ filter, color, center }) =>  {
+  const navigate = useNavigate();
   const sender = getUsername();
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: 'AIzaSyDXBoMxUb1A-6yy3bSWPXE1QHPnwD6jmI4',
@@ -40,11 +42,10 @@ const Map = ({ filter, color, center }) =>  {
     setCenterPosition(center);
   }, [center]);
   const handleContact = useCallback((receiver) => {
-
-    <Navigate to="/ChatRoom" sender={sender} receiver={receiver} />
+    navigate(`/chat/${sender}/${receiver}`);
     
-    console.log(sender);
-    console.log(receiver);
+    // console.log(sender);
+    // console.log(receiver);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

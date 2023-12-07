@@ -44,6 +44,8 @@
     "react-places-autocomplete": "^7.3.0",
     "react-router-dom": "^6.16.0",
     "simplebar-react": "^3.2.4",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
     "use-places-autocomplete": "^4.0.1"
   },
   "devDependencies": {
