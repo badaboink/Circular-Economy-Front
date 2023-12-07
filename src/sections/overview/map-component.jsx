@@ -5,6 +5,7 @@ import { Marker, GoogleMap, InfoWindow, useLoadScript } from '@react-google-maps
 import { Box, Card, Button, Typography } from '@mui/material';
 
 import {isLoggedIn, getUsername} from '../../utils/logic';
+import ChatRoom from '../chat/ChatRoom';
 
 const libraries = ['places'];
 const mapContainerStyle = {
@@ -39,6 +40,9 @@ const Map = ({ filter, color, center }) =>  {
     setCenterPosition(center);
   }, [center]);
   const handleContact = useCallback((receiver) => {
+
+    <Navigate to="/ChatRoom" sender={sender} receiver={receiver} />
+    
     console.log(sender);
     console.log(receiver);
     // eslint-disable-next-line react-hooks/exhaustive-deps
