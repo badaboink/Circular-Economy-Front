@@ -100,7 +100,7 @@ const Map = ({ filter, color, center }) =>  {
                 )}
                 
                 {userIsLoggedIn 
-                // && sender !== selectedMarker.username
+                && sender !== selectedMarker.username
                  &&(
                 <center><Button onClick={() => handleContact(selectedMarker.username)}>Contact</Button>
                 </center>
