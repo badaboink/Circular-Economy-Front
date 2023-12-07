@@ -15,6 +15,7 @@ import { bgGradient } from 'src/theme/css';
 import Iconify from 'src/components/iconify';
 
 import {LOGIN_URL} from '../../utils/apiUrls';
+import {setUsernameIndex} from "../../utils/logic";
 
 // ----------------------------------------------------------------------
 
@@ -53,6 +54,7 @@ export default function LoginView() {
       const responseData = await loginResponse.json();
       if (loginResponse.status === 200) {
         localStorage.setItem('token', responseData.access_token);
+        setUsernameIndex();
         window.location = "/";
       }else {
         setErrorMessage('Login failed. Please check your credentials.');
@@ -97,7 +99,6 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        // onClick={handleClick}
         sx={{mt: 3}}
       >
         Login

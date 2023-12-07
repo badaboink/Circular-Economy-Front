@@ -149,7 +149,6 @@ export default function PostInput() {
         const responseData = await response.json();
         if(response.status === 200)
         {
-          console.log(responseData);
           setFormData({
             title: responseData.postTitle,
             address: responseData.address,
@@ -159,7 +158,6 @@ export default function PostInput() {
             image: responseData.dropboxTemporaryLink
           });
         }
-        
       } catch (error) {
         console.error('Error fetching resource types:', error);
       }
