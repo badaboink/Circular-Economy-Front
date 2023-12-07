@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import PlacesAutocomplete from 'react-places-autocomplete';
 
 import Box from '@mui/material/Box';
@@ -22,13 +23,14 @@ const CustomPaper = (props) => <Paper elevation={2} {...props} />;
 
 export default function PostInput() {
   const theme = useTheme();
+  const { index } = useParams();
 
   const [formData, setFormData] = useState({
     title: '',
     address: '',
     description: '',
     price: '',
-    type: ''
+    type: '',
   });
   const [selectedImage, setSelectedImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -51,35 +53,60 @@ export default function PostInput() {
       [name]: value,
     });
   };
+  const findResourceTypeByName = (name) => resourceTypes.find((type) => type.name === name) || null;
 
   const handleClick = async (event) =>{
     event.preventDefault();
     try{
-      if(!priceError && !errorMessage)
+      if(index === undefined)
       {
-        const postData = {
-          title: formData.title,
-          address: formData.address,
-          description: formData.description,
-          price: formData.price,
-          resourceType: formData.type.name,
-          latitude: 1,
-          longitude: 1,
-        };
-        console.log(selectedImage);
-        // formDataTemp.append('image', selectedImage);
-        const response = await fetch(POSTS_URL, {
-          method: 'POST',
+        if(!priceError && !errorMessage)
+        {
+          const formDataToSend = new FormData();
+          formDataToSend.append('postTitle', formData.title);
+          formDataToSend.append('address', formData.address);
+          formDataToSend.append('postDescription', formData.description);
+          formDataToSend.append('price', formData.price);
+          formDataToSend.append('resourceTypeName', formData.type);
+          if(selectedImage !== null){
+            formDataToSend.append('imageFile', selectedImage);
+          }
+          const response = await fetch(POSTS_URL, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${localStorage.token}`
+            },
+            body: formDataToSend,
+          });
+          if (response.status === 201) {
+            window.location = "/";
+          }else {
+            setErrorMessage('Posting failed');
+          }
+        }
+      }
+      else{
+        const formDataToUpdate = new FormData();
+        formDataToUpdate.append('postTitle', formData.title);
+        formDataToUpdate.append('address', formData.address);
+        formDataToUpdate.append('postDescription', formData.description);
+        formDataToUpdate.append('price', formData.price);
+        formDataToUpdate.append('resourceTypeName', formData.type);
+        if(selectedImage !== null){
+          formDataToUpdate.append('imageFile', selectedImage);
+        }
+        const response = await fetch(`${POSTS_URL}/${index}`, {
+          method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.token}`
           },
-          body: JSON.stringify(postData),
+          body: formDataToUpdate,
         });
-        if (response.status === 201) {
+  
+        if (response.status === 200) {
           window.location = "/";
-        }else {
-          setErrorMessage('Posting failed');
+        } else {
+          setErrorMessage('Update failed');
         }
       }
     } catch (error) {
@@ -90,7 +117,9 @@ export default function PostInput() {
   const handleSelect = (address) => {
     setFormData({ ...formData, address });
   };
+  
   useEffect(() => {
+    
     const fetchResourceTypes = async () => {
       try {
         const response = await fetch(RESOURCE_TYPES_URL, {
@@ -101,16 +130,45 @@ export default function PostInput() {
         });
         const responseData = await response.json();
 
-        // Assuming responseData is an array of resource types
         setResourceTypes(responseData.data);
-        console.log(responseData);
+        console.log(responseData.data);
+        
       } catch (error) {
         console.error('Error fetching resource types:', error);
       }
     };
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${POSTS_URL}/id=${index}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.token}`
+          },
+        });
+        const responseData = await response.json();
+        if(response.status === 200)
+        {
+          setFormData({
+            title: responseData.postTitle,
+            address: responseData.address,
+            description: responseData.postDescription,
+            price: responseData.price,
+            type: responseData.resourceTypeName,
+            image: responseData.dropboxTemporaryLink
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching resource types:', error);
+      }
+    };
+    if(index !== undefined)
+    {
+      fetchData();
+    }
 
     fetchResourceTypes();
-  }, []);
+  }, [index]);
 
   const renderForm = (
     <form noValidate onSubmit={handleClick}>
@@ -150,14 +208,14 @@ export default function PostInput() {
         <TextField
           name="description"
           label="Description"
-          value={formData.password}
+          value={formData.description}
           onChange={handleChange}
         />
         <TextField
           name="price"
-          label="Price"
+          label="Price in €"
           type="number"
-          value={formData.password}
+          value={formData.price}
           onChange={handleChange}
           error={!!priceError}
           helperText={priceError}
@@ -166,7 +224,7 @@ export default function PostInput() {
           id="types"
           name="types"
           label="Resource types"
-          value={formData.type}
+          value={formData.type ? findResourceTypeByName(formData.type) : null}
           options={resourceTypes}
           getOptionLabel={(option) => option?.description || ''} 
           PaperComponent={CustomPaper}
@@ -174,10 +232,15 @@ export default function PostInput() {
           onChange={(event, newValue) => {
             setFormData({
               ...formData,
-              type: newValue,
+              type: newValue ? newValue.name : null,
             });
           }}
         />
+        {formData.image && (
+        <center>
+        <img src={formData.image} alt="Post" style={{ maxWidth: 300, maxHeight: 300 }}/>
+        </center>
+        )}
         <input
           type="file"
           accept="image/*"

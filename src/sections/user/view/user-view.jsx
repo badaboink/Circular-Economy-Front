@@ -1,173 +1,248 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Table from '@mui/material/Table';
+import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
-import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
+import CircularProgress from '@mui/material/CircularProgress';
 
-import { users } from 'src/_mock/user';
-
-import Iconify from 'src/components/iconify';
+// import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
-import TableNoData from '../table-no-data';
-import UserTableRow from '../user-table-row';
-import UserTableHead from '../user-table-head';
-import TableEmptyRows from '../table-empty-rows';
-import UserTableToolbar from '../user-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+import { USER_URL } from '../../../utils/apiUrls';
+import { getUsername } from '../../../utils/logic';
 
 // ----------------------------------------------------------------------
 
 export default function UserPage() {
-  const [page, setPage] = useState(0);
+  const username = getUsername();
+  const [formData, setFormData] = useState();
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorEmail, setErrorEmail] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [changeDone, setChangeDone]= useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const [order, setOrder] = useState('asc');
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${USER_URL}?username=${username}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.token}`
+          },
+        });
+        const responseData = await response.json();
+        if (response.status === 200) {
+          setFormData({
+            username: responseData.username,
+            email: responseData.email,
+            phoneNumber: responseData.phoneNumber,
+            id: responseData.userId
+          });
+        }
+      } catch (error) {
+        setErrorMessage('Error fetching user data');
+        setSuccessMessage('');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const [selected, setSelected] = useState([]);
+  const handleInputChange = (name, value) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
 
-  const [orderBy, setOrderBy] = useState('name');
+    if (name === 'email') {
+      const isValidEmail = validateEmail(value);
+      setSuccessMessage('');
+      setErrorEmail(isValidEmail ? '' : 'Invalid email address');
+    }
 
-  const [filterName, setFilterName] = useState('');
+    setChangeDone(true);
+  };
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const handleSort = (event, id) => {
-    const isAsc = orderBy === id && order === 'asc';
-    if (id !== '') {
-      setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(id);
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  
+  const saveProfile = async () => {
+    if(!errorEmail)
+    {
+      try {
+        const response = await fetch(`${USER_URL}/${formData.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.token}`
+          },
+          body: JSON.stringify({
+            username: formData.username,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber,
+          }),
+        });
+        const responseData = await response.json();
+        if (response.status === 200) {
+          setFormData({
+            username: responseData.username,
+            email: responseData.email,
+            phoneNumber: responseData.phoneNumber,
+            id: responseData.userId
+          });
+          setSuccessMessage('User data saved.');
+        }else {
+          setSuccessMessage('');
+          setErrorMessage('Update failed');
+        }
+      } catch (error) {
+        setSuccessMessage('');
+        setErrorMessage('Error updating user data');
+      }
     }
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
+  const handleDelete = () => {
+    setIsDeleteDialogOpen(true);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
+  const handleConfirmDelete = () => {
+    const deletePost = async () => {
+      try {
+        const response = await fetch(`${USER_URL}/${formData.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.token}`
+          },
+        });
+        if(response.status === 204) {
+          localStorage.removeItem('token');
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Error fetching resource types:', error);
+      }
+    };
+  
+    deletePost();
+    setIsDeleteDialogOpen(false);
   };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
   };
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0);
-    setRowsPerPage(parseInt(event.target.value, 10));
-  };
-
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
-
-  const dataFiltered = applyFilter({
-    inputData: users,
-    comparator: getComparator(order, orderBy),
-    filterName,
-  });
-
-  const notFound = !dataFiltered.length && !!filterName;
 
   return (
+    <>
     <Container>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Users</Typography>
+      <Scrollbar>
+        <TableContainer sx={{ overflow: 'unset' }}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+            <Typography variant="h4">Profile</Typography>
+          </Stack>
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
+              <Card
+                sx={{
+                  p: 5,
+                  width: 1,
+                  maxWidth: '100rem',
+                }}
+              >
+                <Stack spacing={1}>
+                  {formData && (
+                    <>
+                      <Typography variant="body1">Username:</Typography>
+                      <TextField
+                        name="username"
+                        disabled
+                        value={formData.username}
+                      />
+                      <Typography variant="body1">Email:</Typography>
+                      <TextField
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        error={Boolean(errorEmail)}
+                        helperText={errorEmail}
+                      />
+                      <Typography variant="body1">Phone number:</Typography>
+                      <TextField
+                        name="phoneNr"
+                        type="number"
+                        value={formData.phoneNumber}
+                        onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      />
+                    </>
+                  )}
+                </Stack>
 
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          New User
-        </Button>
-      </Stack>
-
-      <Card>
-        <UserTableToolbar
-          numSelected={selected.length}
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-        />
-
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <UserTableHead
-                order={order}
-                orderBy={orderBy}
-                rowCount={users.length}
-                numSelected={selected.length}
-                onRequestSort={handleSort}
-                onSelectAllClick={handleSelectAllClick}
-                headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
-                  { id: '' },
-                ]}
-              />
-              <TableBody>
-                {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      name={row.name}
-                      role={row.role}
-                      status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
-                    />
-                  ))}
-
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
-                />
-
-                {notFound && <TableNoData query={filterName} />}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
-
-        <TablePagination
-          page={page}
-          component="div"
-          count={users.length}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
+                <Box display="flex" justifyContent="center" mt={2}>
+                  <Button variant="contained" color="inherit" sx={{ width: 150 }} onClick={() => saveProfile()}>
+                    Save
+                  </Button>
+                  <Button variant="outlined" color="error" sx={{ ml: 2, width: 150 }} onClick={() => handleDelete()}>
+                    Delete account
+                  </Button>
+                </Box>
+                {errorMessage && (
+                  <Typography variant="body2" sx={{ mt: 2, mb: 2, color: 'error.main' }}>
+                    {errorMessage}
+                  </Typography>
+                )}
+                {successMessage && changeDone && !errorMessage && (
+                  <Typography variant="body2" sx={{ mt: 2, mb: 2, color: 'success.main' }}>
+                    {successMessage}
+                  </Typography>
+                )}
+              </Card>
+            </Stack>
+          )}
+        </TableContainer>
+      </Scrollbar>
     </Container>
+    <Dialog
+    open={isDeleteDialogOpen}
+    onClose={handleCancelDelete}
+    aria-labelledby="delete-post-dialog-title"
+    aria-describedby="delete-post-dialog-description"
+    padding="2"
+  >
+    <DialogTitle id="delete-post-dialog-title">
+      Are you sure you want to delete your account?
+    </DialogTitle>
+    <DialogContent>
+      This action cannot be undone.
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleCancelDelete} color="primary">
+        Cancel
+      </Button>
+      <Button variant="contained" onClick={handleConfirmDelete} color="error">
+        Delete
+      </Button>
+    </DialogActions>
+  </Dialog></>
   );
 }

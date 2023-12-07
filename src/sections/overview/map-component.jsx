@@ -1,28 +1,28 @@
 import PropTypes from 'prop-types';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Marker, GoogleMap, InfoWindow, useLoadScript } from '@react-google-maps/api';
 
 import { Box, Card, Button, Typography } from '@mui/material';
 
-import {isLoggedIn} from '../../utils/logic';
+import {isLoggedIn, getUsername} from '../../utils/logic';
 
 const libraries = ['places'];
 const mapContainerStyle = {
   width: '100rem',
   height: '50rem',
 };
-const center = {
-  lat: 54.8985,
-  lng: 23.9036,
-};
 
-const Map = ({ filter, color }) =>  {
-  
+const Map = ({ filter, color, center }) =>  {
+  const sender = getUsername();
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: 'AIzaSyDXBoMxUb1A-6yy3bSWPXE1QHPnwD6jmI4',
     libraries,
   });
   const userIsLoggedIn = isLoggedIn();
+
+  useEffect(() => {
+    setCenterPosition(center);
+  }, [center]);
 
   const [zoom, setZoom] = useState(13);
   const [centerPosition, setCenterPosition] = useState(center);
@@ -37,6 +37,11 @@ const Map = ({ filter, color }) =>  {
     setSelectedMarker(null);
     setZoom(13);
     setCenterPosition(center);
+  }, [center]);
+  const handleContact = useCallback((receiver) => {
+    console.log(sender);
+    console.log(receiver);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loadError) {
@@ -46,7 +51,6 @@ const Map = ({ filter, color }) =>  {
   if (!isLoaded) {
     return <div>Loading maps</div>;
   }
-  console.log(filter);
 
   return (
     <Card>
@@ -63,7 +67,7 @@ const Map = ({ filter, color }) =>  {
               onClick={() => handleMarkerClick(city)}
               icon={{
                 path: 'M22-48h-44v43h16l6 5 6-5h16z',
-                fillColor: color, 
+                fillColor: color,
                 fillOpacity: 1,
                 strokeColor: '#ffffff',
                 strokeWeight: 2,
@@ -76,14 +80,30 @@ const Map = ({ filter, color }) =>  {
             <InfoWindow
               position={selectedMarker.position}
               onCloseClick={handleInfoWindowClose}
-              options={{ maxWidth: 250, minWidth: 250 }}
+              options={{ maxWidth: 300, minWidth: 300 }}
             >
               <div>
                 <Typography variant="h4">{selectedMarker.title}</Typography>
                 <Typography variant="subtitle2">{selectedMarker.address}</Typography>
                 <Typography variant="body">{selectedMarker.description}</Typography>
-                {userIsLoggedIn &&(
-                <center><Button>Contact</Button></center>
+                <br/>
+                <Typography variant="body">Price: {selectedMarker.price} €</Typography>
+                <br/>
+                { selectedMarker.image && (
+                  <center>
+                <img
+                  src={selectedMarker.image}
+                  alt="Post"
+                  style={{ maxWidth: 200, maxHeight: 200 }}
+                />
+                </center>
+                )}
+                
+                {userIsLoggedIn 
+                // && sender !== selectedMarker.username
+                 &&(
+                <center><Button onClick={() => handleContact(selectedMarker.username)}>Contact</Button>
+                </center>
                 )}
               </div>
             </InfoWindow>
@@ -97,5 +117,6 @@ const Map = ({ filter, color }) =>  {
 Map.propTypes = {
   filter: PropTypes.array,
   color: PropTypes.string,
+  center: PropTypes.any
 };
 export default Map;

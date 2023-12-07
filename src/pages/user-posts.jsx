@@ -1,13 +1,13 @@
 import { Helmet } from 'react-helmet-async';
 
 import { NotFoundView } from 'src/sections/error';
-import { UserView } from 'src/sections/user/view';
+import { UserView } from 'src/sections/user-posts/view';
 
 import {isLoggedIn} from '../utils/logic';
 
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function UserPosts() {
   const userIsLoggedIn = isLoggedIn();
   return (
     <>
@@ -16,7 +16,7 @@ export default function UserPage() {
       ) : (
         <>
           <Helmet>
-            <title> User </title>
+          <title> My posts</title>
           </Helmet>
 
           <UserView />
