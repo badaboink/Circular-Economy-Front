@@ -16,7 +16,6 @@ const mapContainerStyle = {
 
 const Map = ({ filter, color, center }) =>  {
   const navigate = useNavigate();
-  const sender = getUsername();
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: 'AIzaSyDXBoMxUb1A-6yy3bSWPXE1QHPnwD6jmI4',
     libraries,
@@ -42,7 +41,7 @@ const Map = ({ filter, color, center }) =>  {
     setCenterPosition(center);
   }, [center]);
   const handleContact = useCallback((receiver) => {
-    navigate(`/chat/${sender}/${receiver}`);
+    navigate(`/chat/${receiver}`);
     
     // console.log(sender);
     // console.log(receiver);
@@ -105,7 +104,7 @@ const Map = ({ filter, color, center }) =>  {
                 )}
                 
                 {userIsLoggedIn 
-                // && sender !== selectedMarker.username
+                && getUsername() !== selectedMarker.username
                  &&(
                 <center><Button onClick={() => handleContact(selectedMarker.username)}>Contact</Button>
                 </center>

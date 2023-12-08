@@ -34,7 +34,7 @@ export default function Router() {
         { path: 'resource/:index', element: <IndexPage /> },
         { path: 'personal', element: <UserPostPage /> },
         { path: 'chat', element: <ChatRoomPage /> },
-        { path: 'chat/:sender/:receiver', element: <ChatRoomPage /> },
+        { path: 'chat/:receiver', element: <ChatRoomPage /> },
       ],
     },
     {
