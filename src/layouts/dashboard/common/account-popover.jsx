@@ -30,6 +30,7 @@ const MENU_OPTIONS = [
   {
     label: 'Messages',
     icon: 'eva:home-fill',
+    path: '/chat'
   },
 ];
 

@@ -150,7 +150,7 @@ export default function Nav({ openNav, onCloseNav }) {
               }}
             >
             <Box component="span" sx={{ width: 24, height: 24, mr: 2 }}>
-              <Iconify icon="bxs:home" />
+              <Iconify icon="clarity:map-solid" />
             </Box>
             <Box component="span"><b>All posts</b></Box>
         </ListItemButton>

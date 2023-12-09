@@ -1,8 +1,12 @@
+
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Marker, GoogleMap, InfoWindow, useLoadScript } from '@react-google-maps/api';
 
 import { Box, Card, Button, Typography } from '@mui/material';
+
+import Iconify from 'src/components/iconify';
 
 import {isLoggedIn, getUsername} from '../../utils/logic';
 
@@ -13,7 +17,7 @@ const mapContainerStyle = {
 };
 
 const Map = ({ filter, color, center }) =>  {
-  const sender = getUsername();
+  const navigate = useNavigate();
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: 'AIzaSyDXBoMxUb1A-6yy3bSWPXE1QHPnwD6jmI4',
     libraries,
@@ -39,8 +43,7 @@ const Map = ({ filter, color, center }) =>  {
     setCenterPosition(center);
   }, [center]);
   const handleContact = useCallback((receiver) => {
-    console.log(sender);
-    console.log(receiver);
+    navigate(`/chat/${receiver}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -84,10 +87,17 @@ const Map = ({ filter, color, center }) =>  {
             >
               <div>
                 <Typography variant="h4">{selectedMarker.title}</Typography>
-                <Typography variant="subtitle2">{selectedMarker.address}</Typography>
-                <Typography variant="body">{selectedMarker.description}</Typography>
+                <Typography variant="subtitle2"><Iconify icon="bxs:map"/>{selectedMarker.address}</Typography>
+                <Typography variant="body1">{selectedMarker.description}</Typography>
+                <Typography variant="body2">Price: {selectedMarker.price} €</Typography>
                 <br/>
-                <Typography variant="body">Price: {selectedMarker.price} €</Typography>
+                {userIsLoggedIn && (
+                  <>
+                  <Typography variant="body2">post by @{selectedMarker.username}</Typography>
+                  <Typography variant="body">({selectedMarker.phoneNumber}; {selectedMarker.email})</Typography>
+                  </>
+                )}
+                <br/>
                 <br/>
                 { selectedMarker.image && (
                   <center>
@@ -100,7 +110,7 @@ const Map = ({ filter, color, center }) =>  {
                 )}
                 
                 {userIsLoggedIn 
-                // && sender !== selectedMarker.username
+                && getUsername() !== selectedMarker.username
                  &&(
                 <center><Button onClick={() => handleContact(selectedMarker.username)}>Contact</Button>
                 </center>
