@@ -83,6 +83,8 @@ export default function AppView() {
               price: item.price,
               image: item.dropboxTemporaryLink,
               username: item.username,
+              phoneNumber: item.phoneNumber,
+              email: item.email
             }));
             setFilter(formattedData);
             setColor(colors[14]);
@@ -172,13 +174,10 @@ export default function AppView() {
         </Grid>
         
         {userIsLoggedIn &&(
-        <Grid item xs={12} md={6} container justifyContent="flex-end" alignItems="flex-start">
+        <Grid item xs={12} md={12} container justifyContent="flex-end" alignItems="flex-start">
          <Button variant="outlined" color="inherit" sx={{mr: 1, height: 35}} onClick={handleNewPostClick} startIcon={<Iconify icon="eva:plus-fill" />}>
           New post
          </Button>
-          <Button variant="outlined" color="inherit">
-            All posts
-          </Button>
         </Grid>
        )}
         <Grid item xs={12} md={12} lg={12}>

@@ -1,18 +1,26 @@
 import { Helmet } from 'react-helmet-async';
 
-// import { BlogView } from 'src/sections/chat/view';
-
 import ChatRoom from 'src/sections/chat/Chat';
+import { NotFoundView } from 'src/sections/error';
+
+import {isLoggedIn} from '../utils/logic';
 // ----------------------------------------------------------------------
 
 export default function ChatRoomPage() {
+  const userIsLoggedIn = isLoggedIn();
   return (
-    <>
-      <Helmet>
-        <title> Chats </title>
-      </Helmet>
+     <>
+     {!userIsLoggedIn ? (
+       <NotFoundView />
+     ) : (
+       <>
+         <Helmet>
+         <title> Messages</title>
+         </Helmet>
 
-      <ChatRoom />
-    </>
+         <ChatRoom />
+       </>
+     )}
+   </>
   );
 }

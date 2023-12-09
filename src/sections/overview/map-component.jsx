@@ -6,6 +6,8 @@ import { Marker, GoogleMap, InfoWindow, useLoadScript } from '@react-google-maps
 
 import { Box, Card, Button, Typography } from '@mui/material';
 
+import Iconify from 'src/components/iconify';
+
 import {isLoggedIn, getUsername} from '../../utils/logic';
 
 const libraries = ['places'];
@@ -42,9 +44,6 @@ const Map = ({ filter, color, center }) =>  {
   }, [center]);
   const handleContact = useCallback((receiver) => {
     navigate(`/chat/${receiver}`);
-    
-    // console.log(sender);
-    // console.log(receiver);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -88,10 +87,17 @@ const Map = ({ filter, color, center }) =>  {
             >
               <div>
                 <Typography variant="h4">{selectedMarker.title}</Typography>
-                <Typography variant="subtitle2">{selectedMarker.address}</Typography>
-                <Typography variant="body">{selectedMarker.description}</Typography>
+                <Typography variant="subtitle2"><Iconify icon="bxs:map"/>{selectedMarker.address}</Typography>
+                <Typography variant="body1">{selectedMarker.description}</Typography>
+                <Typography variant="body2">Price: {selectedMarker.price} €</Typography>
                 <br/>
-                <Typography variant="body">Price: {selectedMarker.price} €</Typography>
+                {userIsLoggedIn && (
+                  <>
+                  <Typography variant="body2">post by @{selectedMarker.username}</Typography>
+                  <Typography variant="body">({selectedMarker.phoneNumber}; {selectedMarker.email})</Typography>
+                  </>
+                )}
+                <br/>
                 <br/>
                 { selectedMarker.image && (
                   <center>

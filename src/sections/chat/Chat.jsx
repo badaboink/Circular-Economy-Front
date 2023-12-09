@@ -3,6 +3,17 @@ import SockJS from 'sockjs-client';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect  } from 'react';
 
+import Card from '@mui/material/Card';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+// import Table from '@mui/material/Table';
+import Container from '@mui/material/Container';
+// import TableBody from '@mui/material/TableBody';
+import Typography from '@mui/material/Typography';
+// import TableContainer from '@mui/material/TableContainer';
+
 import { getUsername } from "../../utils/logic";
 
 const ChatComponent = () => {
@@ -11,18 +22,19 @@ const ChatComponent = () => {
   const [privateChats, setPrivateChats] = useState(new Map());
   const [publicChats, setPublicChats] = useState([]);
   const [tab, setTab] = useState('CHATROOM');
+  const [error, setError] = useState('');
   const [userData, setUserData] = useState({
     username: getUsername(),
     receivername: receiver,
     connected: false,
     message: '',
   });
-
   useEffect(() => {
     if (stompClient) {
       userJoin();
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stompClient]);
 
   const connect = () => {
     const socket = new SockJS('http://localhost:8080/ws');
@@ -31,12 +43,8 @@ const ChatComponent = () => {
     stomp.connect({}, () => {
       console.log('Connected!');
       
-      
       setStompClient((prevStompClient) => {
-        console.log(stompClient);
-        // Use the previous state to ensure the latest stompClient
         if (prevStompClient) {
-          console.log(prevStompClient);
           userJoin();
         }
         return stomp;
@@ -45,14 +53,9 @@ const ChatComponent = () => {
   
       stomp.subscribe('/chatroom/public', onMessageReceived);
       stomp.subscribe(`/user/${userData.username}/private`, onPrivateMessage);
+
     }, onError);
   };
-  // const onConnected = () => {
-  //   setUserData({ ...userData, connected: true });
-  //   stompClient.subscribe('/chatroom/public', onMessageReceived);
-  //   stompClient.subscribe(`/user/${userData.username}/private`, onPrivateMessage);
-  //   userJoin();
-  // };
 
   const userJoin = () => {
     const chatMessage = {
@@ -66,24 +69,27 @@ const ChatComponent = () => {
     const payloadData = JSON.parse(payload.body);
     switch (payloadData.status) {
       case 'JOIN':
-        // Check if the sender is already in privateChats
         if (!privateChats.has(payloadData.senderName)) {
-          // Add a new entry with an empty array
           privateChats.set(payloadData.senderName, []);
-          setPrivateChats(new Map(privateChats)); // Update privateChats state
+          setPrivateChats(new Map(privateChats));
         }
+        setPublicChats(payloadData.connectedUsers || []);
         break;
       case 'MESSAGE':
-        // Check if it's a private message
         if (payloadData.receiverName) {
-          // Update private chat for the specific user
           const privateChat = privateChats.get(payloadData.senderName) || [];
           privateChat.push(payloadData);
           privateChats.set(payloadData.senderName, privateChat);
           setPrivateChats(new Map(privateChats));
-        } else {
-          // It's a public message
-          setPublicChats([...publicChats, payloadData]);
+        }  else {
+          setPublicChats((prevPublicChats) => [
+            ...prevPublicChats,
+            {
+              messageId: payloadData.messageId,
+              senderName: payloadData.senderName,
+              message: payloadData.message,
+            },
+          ]);
         }
         break;
       default:
@@ -111,23 +117,25 @@ const ChatComponent = () => {
   const handleMessage = (event) => {
     const { value } = event.target;
     setUserData({ ...userData, message: value });
+    setError('');
   };
 
   const sendValue = () => {
-    if (stompClient) {
+    if (stompClient && userData.message.trim() !== '') {
       const chatMessage = {
         senderName: userData.username,
         message: userData.message,
         status: 'MESSAGE',
       };
-      console.log(chatMessage);
       stompClient.send('/app/message', {}, JSON.stringify(chatMessage));
       setUserData({ ...userData, message: '' });
+    }else {
+      setError('Message cannot be empty');
     }
   };
 
   const sendPrivateValue = () => {
-    if (stompClient) {
+    if (stompClient && userData.message.trim() !== '') {
       const chatMessage = {
         senderName: userData.username,
         receiverName: tab,
@@ -141,96 +149,185 @@ const ChatComponent = () => {
       }
       stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
       setUserData({ ...userData, message: '' });
+    }else {
+      setError('Message cannot be empty');
     }
   };
-
-  // const handleUsername = (event) => {
-  //   const { value } = event.target;
-  //   setUserData({ ...userData, username: value });
-  // };
-
-  const registerUser = () => {
-    setUserData({ ...userData, username: getUsername() });
-    connect();
-  };
-
   return (
-    <div className="container">
+    <Container>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Typography variant="h4">Messages</Typography>
+      </Stack>
       {userData.connected ? (
-        <div className="chat-box">
-          <div className="member-list">
-            <ul>
-                <li>
-                <button
-                    type="button"
-                    onClick={() => setTab('CHATROOM')}
-                    className={`member ${tab === 'CHATROOM' && 'active'}`}
+        <Card
+        sx={{
+          p: 5,
+          width: 1,
+          maxWidth: '100rem',
+        }}
+        >
+        <Grid container spacing={2}>
+          <Grid item xs={2}>
+            <Grid container direction="column" spacing={1}>
+              <Grid item>
+                <Stack>
+                <Button
+                  type="button"
+                  onClick={() => setTab('CHATROOM')}
+                  className={`member ${tab === 'CHATROOM' && 'active'}`}
+                  variant={tab === 'CHATROOM' ? 'contained' : 'outlined'}
                 >
-                    Chatroom
-                </button>
-                </li>
-                {[...privateChats.keys()].map((name, index) => (
-                <li key={index}>
-                    <button
-                    type="button"
-                    onClick={() => setTab(name)}
-                    className={`member ${tab === name && 'active'}`}
+                  Chat room
+                </Button>
+                </Stack>
+              </Grid>
+              {[...privateChats.keys()].map((name, index) => (
+                <Grid item key={index}>
+                  {name !== getUsername() && (
+                    <Stack>
+                      
+                    <Button
+                      type="button"
+                      onClick={() => setTab(name)}
+                      variant={tab === name ? 'contained' : 'outlined'}
+                      className={`member ${tab === name && 'active'}`}
                     >
-                    {name}
-                    </button>
-                </li>
-                ))}
-            </ul>
-            </div>
-          {tab === 'CHATROOM' && (
-            <div className="chat-content">
-              <ul className="chat-messages">
-                {publicChats.map((chat, index) => (
-                  <li className={`message ${chat.senderName === userData.username && 'self'}`} key={index}>
-                    {chat.senderName !== userData.username && <div className="avatar">{chat.senderName}</div>}
-                    <div className="message-data">{chat.message}</div>
-                    {chat.senderName === userData.username && <div className="avatar self">{chat.senderName}</div>}
-                  </li>
-                ))}
-              </ul>
+                      {name}
+                    </Button>
+                    </Stack>
+                  )}
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
+          <Grid item xs={10}>
+            <div className="chat-box" >
+            {tab === 'CHATROOM' && (
+              <div className="chat-content">
+                <div style={{ overflowY: 'auto', maxHeight: '400px', maxWidth: '890px', height: '400px', paddingRight: '10px', paddingLeft: '10px', backgroundColor: '#f9fafb' }}>
+                  <Grid container direction="column" spacing={0} >
+                    {Object.values(publicChats).map((chat, index) => (
+                        
+                      <Grid key={index} item className={`message ${chat.senderName === userData.username && 'self'}`}>
+                        
+                        <div style={{ textAlign: chat.senderName === userData.username ? 'right' : 'left' }}>
+                          {chat.senderName !== userData.username && (
+                            <Typography variant="body2" className="avatar">
+                              @{chat.senderName}
+                            </Typography>
+                          )}
+                          {chat.senderName === userData.username && (
+                            <Typography variant="body2" className="avatar self">
+                              @{chat.senderName}
+                            </Typography>
+                          )}
+                          <Typography variant="body1" className="message-data">
+                            {chat.message}
+                          </Typography>
+                        </div>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </div>
 
-              <div className="send-message">
-                <input type="text" className="input-message" placeholder="enter the message" value={userData.message} onChange={handleMessage} />
-                <button type="button" className="send-button" onClick={sendValue}>
-                  send
-                </button>
+                <Grid container spacing={2}>
+                  <Grid item xs={11}>
+                    <TextField
+                      fullWidth
+                      type="text"
+                      label="Enter a message"
+                      variant="outlined"
+                      value={userData.message}
+                      onChange={handleMessage}
+                      error={!!error}
+                      helperText={error}
+                    />
+                  </Grid>
+                  <Grid item xs={1}>
+                    <Button
+                      fullWidth
+                      type="button"
+                      color="inherit"
+                      variant="contained"
+                      onClick={sendValue}
+                      style={{ height: '100%' }}
+                    >
+                      Send
+                    </Button>
+                  </Grid>
+                </Grid>
               </div>
-            </div>
-          )}
-          {tab !== 'CHATROOM' && (
-            <div className="chat-content">
-              <ul className="chat-messages">
-                {[...privateChats.get(tab)].map((chat, index) => (
-                  <li className={`message ${chat.senderName === userData.username && 'self'}`} key={index}>
-                    {chat.senderName !== userData.username && <div className="avatar">{chat.senderName}</div>}
-                    <div className="message-data">{chat.message}</div>
-                    {chat.senderName === userData.username && <div className="avatar self">{chat.senderName}</div>}
-                  </li>
-                ))}
-              </ul>
+            )}
+              {tab !== 'CHATROOM' && (
+                <div className="chat-content">
+                  <div style={{ overflowY: 'auto', maxHeight: '400px', maxWidth: '890px', height: '400px', paddingRight: '10px', paddingLeft: '10px', backgroundColor: '#f9fafb' }}>
+                    <Grid container direction="column" spacing={0}>
+                      {[...privateChats.get(tab)].map((chat, index) => (
+                        <Grid item key={index} className={`message ${chat.senderName === userData.username && 'self'}`}>
+                        <div style={{ textAlign: chat.senderName === userData.username ? 'right' : 'left' }}>
+                          {chat.message!=='' &&(
+                            <>
+                            {chat.senderName !== userData.username && (
+                              <Typography variant="body2" className="avatar">
+                                @{chat.senderName}
+                              </Typography>
+                            )}
+                            {chat.senderName === userData.username && (
+                              <Typography variant="body2" className="avatar self">
+                                @{chat.senderName}
+                              </Typography>
+                            )}
+                            <Typography variant="body1" className="message-data">
+                              {chat.message}
+                            </Typography>
+                            </>
+                            )}
+                          </div>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </div>
 
-              <div className="send-message">
-                <input type="text" className="input-message" placeholder="enter the message" value={userData.message} onChange={handleMessage} />
-                <button type="button" className="send-button" onClick={sendPrivateValue}>
-                  send
-                </button>
-              </div>
+                  <Grid container spacing={2}>
+                    <Grid item xs={11}>
+                      <TextField
+                        fullWidth
+                        type="text"
+                        label="Enter a message"
+                        variant="outlined"
+                        value={userData.message}
+                        onChange={handleMessage}
+                        error={!!error}
+                        helperText={error}
+                      />
+                    </Grid>
+                    <Grid item xs={1}>
+                      <Button
+                        fullWidth
+                        type="button"
+                        color="inherit"
+                        variant="contained"
+                        onClick={sendPrivateValue}
+                        style={{ height: '100%' }}
+                      >
+                        Send
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </Grid>
+        </Grid>
+        </Card>
       ) : (
-        <div className="register">
-          <button type="button" onClick={registerUser}>
+        <Stack className="register">
+          <Button type="button" color='inherit' variant='contained' onClick={connect}>
             Connect
-          </button>
-        </div>
+          </Button>
+        </Stack>
       )}
-    </div>
+    </Container>
   );
 };
 
