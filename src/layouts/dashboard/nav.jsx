@@ -29,7 +29,6 @@ import {isLoggedIn, getUsername } from "../../utils/logic";
 // ----------------------------------------------------------------------
 
 export default function Nav({ openNav, onCloseNav }) {
-  // const pathname = usePathname();
   const navigate = useNavigate();
   const location = useLocation();
   const userIsLoggedIn = isLoggedIn();

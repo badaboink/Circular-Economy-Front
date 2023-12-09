@@ -204,7 +204,7 @@ const ChatComponent = () => {
             <div className="chat-box" >
             {tab === 'CHATROOM' && (
               <div className="chat-content">
-                <div style={{ overflowY: 'auto', maxHeight: '400px', maxWidth: '890px', height: '400px', paddingRight: '10px', paddingLeft: '10px', backgroundColor: '#f9fafb' }}>
+                <div style={{ overflowY: 'auto', maxHeight: '400px', maxWidth: '890px', height: '400px', paddingTop: '10px', paddingRight: '10px', paddingLeft: '10px', backgroundColor: '#f9fafb' }}>
                   <Grid container direction="column" spacing={0} >
                     {Object.values(publicChats).map((chat, index) => (
                         
@@ -260,7 +260,7 @@ const ChatComponent = () => {
             )}
               {tab !== 'CHATROOM' && (
                 <div className="chat-content">
-                  <div style={{ overflowY: 'auto', maxHeight: '400px', maxWidth: '890px', height: '400px', paddingRight: '10px', paddingLeft: '10px', backgroundColor: '#f9fafb' }}>
+                  <div style={{ overflowY: 'auto', maxHeight: '400px', maxWidth: '890px', height: '400px', paddingTop: '10px', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '10px', backgroundColor: '#f9fafb' }}>
                     <Grid container direction="column" spacing={0}>
                       {[...privateChats.get(tab)].map((chat, index) => (
                         <Grid item key={index} className={`message ${chat.senderName === userData.username && 'self'}`}>

@@ -31,11 +31,15 @@ const Map = ({ filter, color, center }) =>  {
   const [zoom, setZoom] = useState(13);
   const [centerPosition, setCenterPosition] = useState(center);
   const [selectedMarker, setSelectedMarker] = useState(null);
-
+  const offsetPixels = 0.30;
   const handleMarkerClick = useCallback((city) => {
     setSelectedMarker(city);
-    setZoom(16);
-    setCenterPosition(city.position);
+    setZoom(15);
+    const adjustedPosition = {
+      lat: city.position.lat + (offsetPixels / (111 * Math.cos((city.position.lat * Math.PI) / 180))),
+      lng: city.position.lng,
+    };
+    setCenterPosition(adjustedPosition);
   }, []);
   const handleInfoWindowClose = useCallback(() => {
     setSelectedMarker(null);

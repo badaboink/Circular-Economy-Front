@@ -136,7 +136,7 @@ export default function AppView() {
   return (
     <Container maxWidth="xl">
       <Grid container spacing={2} alignItems="flex-start">
-        <Grid container xs={6} md={12} sx={{mt:4}}>
+        <Grid container xs={12} md={12} sx={{mt:4}}>
 
           <Grid item xs={12} md={12} container justifyContent="flex-start" alignItems="flex-start">
           {!userIsLoggedIn && (
@@ -145,7 +145,7 @@ export default function AppView() {
             </Typography>
           )}
           </Grid>
-          <Grid item xs={4} md={10} container justifyContent="flex-start" alignItems="flex-start">
+          <Grid item xs={10} md={10} container justifyContent="flex-start" alignItems="flex-start">
             <PlacesAutocomplete
               value={formData.address}
               onChange={(address) => setFormData({ ...formData, address })}
@@ -163,7 +163,8 @@ export default function AppView() {
                       fullWidth: true,
                     })}
                     sx={{
-                      width: 600
+                      minWidth: 400,
+                      maxWidth: 800
                     }}
                   />
                   <div className="autocomplete-dropdown-container">
@@ -180,7 +181,7 @@ export default function AppView() {
           </Grid>
 
         {userIsLoggedIn && (
-          <Grid item xs={8} md={2} container justifyContent="flex-end" alignItems="flex-start">
+          <Grid item xs={2} md={2} container justifyContent="flex-end" alignItems="flex-start">
             <Button
               variant="outlined"
               color="inherit"
