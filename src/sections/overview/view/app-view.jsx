@@ -20,6 +20,16 @@ import {POSTS_URL} from "../../../utils/apiUrls";
 
 const defaultFilter = [
 ];
+const getRandomCoordinates = () => {
+  const cityCoordinates = [
+    { lat: 54.8985, lng: 23.9036 }, // Kaunas
+    { lat: 56.9677, lng: 24.1056 }, // Riga
+    { lat: 54.6872, lng: 25.2797 }, // Vilnius
+  ];
+
+  const randomIndex = Math.floor(Math.random() * cityCoordinates.length);
+  return cityCoordinates[randomIndex];
+};
 export default function AppView() {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -29,14 +39,9 @@ export default function AppView() {
   const userIsLoggedIn = isLoggedIn();
   const [formData, setFormData] = useState({
     address: '',
-    coordinates: {
-      lat: localStorage.getItem('selectedCoordinates')
-        ? JSON.parse(localStorage.getItem('selectedCoordinates')).lat
-        : 54.8985,
-      lng: localStorage.getItem('selectedCoordinates')
-      ? JSON.parse(localStorage.getItem('selectedCoordinates')).lng
-      : 23.9036,
-    },
+    coordinates: localStorage.getItem('selectedCoordinates')
+      ? JSON.parse(localStorage.getItem('selectedCoordinates'))
+      : getRandomCoordinates(),
   });
 
   useEffect(() => {
