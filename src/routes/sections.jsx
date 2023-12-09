@@ -9,7 +9,6 @@ export const UserPage = lazy(() => import('src/pages/user'));
 export const UserPostPage = lazy(() => import('src/pages/user-posts'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const RegisterPage = lazy(() => import('src/pages/register'));
-export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const PostPage = lazy(() => import('src/pages/post'));
 export const ChatRoomPage = lazy(() => import('src/pages/chat'));

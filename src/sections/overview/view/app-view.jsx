@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PlacesAutocomplete, { getLatLng, geocodeByAddress } from 'react-places-autocomplete';
 
+import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import Iconify from 'src/components/iconify';
@@ -136,55 +136,64 @@ export default function AppView() {
   return (
     <Container maxWidth="xl">
       <Grid container spacing={2} alignItems="flex-start">
-        <Grid item xs={12} md={6}>
+        <Grid container xs={6} md={12} sx={{mt:4}}>
 
-          {!userIsLoggedIn &&(
-            <Typography variant="h4" sx={{ mb: 5 }}>
-            Welcome ♻️
+          <Grid item xs={12} md={12} container justifyContent="flex-start" alignItems="flex-start">
+          {!userIsLoggedIn && (
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              Welcome ♻️
             </Typography>
           )}
-          {/* {userIsLoggedIn &&( */}
-            <Grid item xs={12} md={12} container justifyContent="flex-start" alignItems="flex-start">
+          </Grid>
+          <Grid item xs={4} md={10} container justifyContent="flex-start" alignItems="flex-start">
             <PlacesAutocomplete
-            value={formData.address}
-            onChange={(address) => setFormData({ ...formData, address })}
-            onSelect={handleSelect}
-            searchOptions={{
-              types: ['(cities)'],
-            }}
-                
-              >
-            {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-              <div>
-                <TextField
-                  {...getInputProps({
-                    label: 'Search cities ...',
-                    variant: 'outlined',
-                    fullWidth: true,
-                  })}
-                />
-                <div className="autocomplete-dropdown-container">
-                  {loading && <div>Loading...</div>}
-                  {suggestions.map((suggestion) => (
-                    <div {...getSuggestionItemProps(suggestion)}>
-                      {suggestion.description}
-                    </div>
-                  ))}
+              value={formData.address}
+              onChange={(address) => setFormData({ ...formData, address })}
+              onSelect={handleSelect}
+              searchOptions={{
+                types: ['(cities)'],
+              }}
+            >
+              {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                <div>
+                  <TextField
+                    {...getInputProps({
+                      label: 'Search cities ...',
+                      variant: 'outlined',
+                      fullWidth: true,
+                    })}
+                    sx={{
+                      width: 600
+                    }}
+                  />
+                  <div className="autocomplete-dropdown-container">
+                    {loading && <div>Loading...</div>}
+                    {suggestions.map((suggestion) => (
+                      <div {...getSuggestionItemProps(suggestion)}>
+                        {suggestion.description}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             </PlacesAutocomplete>
-            </Grid>
-          {/* )} */}
-        </Grid>
+          </Grid>
+
+        {userIsLoggedIn && (
+          <Grid item xs={8} md={2} container justifyContent="flex-end" alignItems="flex-start">
+            <Button
+              variant="outlined"
+              color="inherit"
+              sx={{ mr: 1, height: 50 }}
+              onClick={handleNewPostClick}
+              startIcon={<Iconify icon="eva:plus-fill" />}
+            >
+              New post
+            </Button>
+          </Grid>
+        )}
         
-        {userIsLoggedIn &&(
-        <Grid item xs={12} md={12} container justifyContent="flex-end" alignItems="flex-start">
-         <Button variant="outlined" color="inherit" sx={{mr: 1, height: 35}} onClick={handleNewPostClick} startIcon={<Iconify icon="eva:plus-fill" />}>
-          New post
-         </Button>
         </Grid>
-       )}
         <Grid item xs={12} md={12} lg={12}>
           {formData.coordinates && (
             <Map filter={filter} color={color} center={formData.coordinates} />
