@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import PlacesAutocomplete from 'react-places-autocomplete';
 
 import Box from '@mui/material/Box';
@@ -24,6 +24,7 @@ const CustomPaper = (props) => <Paper elevation={2} {...props} />;
 export default function PostInput() {
   const theme = useTheme();
   const { index } = useParams();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -87,6 +88,7 @@ export default function PostInput() {
       }
       else{
         const formDataToUpdate = new FormData();
+        formDataToUpdate.append('postId', index);
         formDataToUpdate.append('postTitle', formData.title);
         formDataToUpdate.append('address', formData.address);
         formDataToUpdate.append('postDescription', formData.description);
@@ -104,7 +106,7 @@ export default function PostInput() {
         });
   
         if (response.status === 200) {
-          window.location = "/";
+          navigate(-1);
         } else {
           setErrorMessage('Update failed');
         }

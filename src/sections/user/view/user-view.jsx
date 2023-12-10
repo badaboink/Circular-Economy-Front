@@ -9,17 +9,19 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import InputAdornment from '@mui/material/InputAdornment';
 import TableContainer from '@mui/material/TableContainer';
 import CircularProgress from '@mui/material/CircularProgress';
 
-// import Iconify from 'src/components/iconify';
+import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import { USER_URL } from '../../../utils/apiUrls';
-import { getUsername } from '../../../utils/logic';
+import { getUsername, setUsernameIndex } from '../../../utils/logic';
 
 // ----------------------------------------------------------------------
 
@@ -29,9 +31,11 @@ export default function UserPage() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [errorEmail, setErrorEmail] = useState('');
+  const [errorPassword, setErrorPassword] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [changeDone, setChangeDone]= useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,12 +50,13 @@ export default function UserPage() {
         });
         const responseData = await response.json();
         if (response.status === 200) {
-          setFormData({
+          setFormData((prevFormData) => ({
+            ...prevFormData,
             username: responseData.username,
             email: responseData.email,
             phoneNumber: responseData.phoneNumber,
-            id: responseData.userId
-          });
+            id: responseData.userId,
+          }));
         }
       } catch (error) {
         setErrorMessage('Error fetching user data');
@@ -85,7 +90,13 @@ export default function UserPage() {
   };
   
   const saveProfile = async () => {
-    if(!errorEmail)
+    if(!formData.password)
+    {
+      setErrorPassword("Must enter password to save changes.");
+      return;
+    }
+    setErrorPassword('');
+    if(!errorEmail && !errorPassword)
     {
       try {
         const response = await fetch(`${USER_URL}/${formData.id}`, {
@@ -98,20 +109,27 @@ export default function UserPage() {
             username: formData.username,
             email: formData.email,
             phoneNumber: formData.phoneNumber,
+            password: formData.password
           }),
         });
         const responseData = await response.json();
         if (response.status === 200) {
-          setFormData({
+          setFormData((prevFormData) => ({
+            ...prevFormData,
             username: responseData.username,
             email: responseData.email,
             phoneNumber: responseData.phoneNumber,
-            id: responseData.userId
-          });
+            id: responseData.userId,
+          }));
+          if(responseData.accessToken) {
+            localStorage.setItem('token', responseData.accessToken);
+            setUsernameIndex();
+          }
           setSuccessMessage('User data saved.');
+          setErrorMessage('');
         }else {
           setSuccessMessage('');
-          setErrorMessage('Update failed');
+          setErrorMessage(responseData);
         }
       } catch (error) {
         setSuccessMessage('');
@@ -175,8 +193,8 @@ export default function UserPage() {
                       <Typography variant="body1">Username:</Typography>
                       <TextField
                         name="username"
-                        disabled
                         value={formData.username}
+                        onChange={(e) => handleInputChange('username', e.target.value)}
                       />
                       <Typography variant="body1">Email:</Typography>
                       <TextField
@@ -193,6 +211,24 @@ export default function UserPage() {
                         type="number"
                         value={formData.phoneNumber}
                         onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      />
+                      <Typography variant="overline" color="text.error">Enter password to confirm changes:</Typography>
+                      <TextField
+                        name="password"
+                        value={formData.password}
+                        type={showPassword ? 'text' : 'password'}
+                        onChange={(e) => handleInputChange('password', e.target.value)}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                        error={Boolean(errorPassword)}
+                        helperText={errorPassword}
                       />
                     </>
                   )}
